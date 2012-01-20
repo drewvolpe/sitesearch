@@ -1,0 +1,23 @@
+
+
+
+
+-- Add button for 'Hide' on toolbar and button to 'Show' to left of URL
+
+--add pref for open in new tab
+
+-add pref for should change focus to newly opened tab
+
+--make it not open new tab if already viewing results (re-use tab)
+--also, make it not use google.com if already viewing results
+
+-add prefs for right-click menu
+-add "feeling lucky" menu 
+
+-add prefs for toolbar
+
+-add ability to add own CSEs
+
+-
+
+

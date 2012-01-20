@@ -1,0 +1,3 @@
+content     sitesearch    chrome/content/
+overlay chrome://browser/content/browser.xul chrome://sitesearch/content/sitesearchtoolbar.xul
+overlay chrome://browser/content/browser.xul chrome://sitesearch/content/rightclickoverlay.xul

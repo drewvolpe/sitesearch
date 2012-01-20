@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+ 
+<prefwindow id="sitesearch-prefs"
+    type="prefwindow"
+    title="SiteSearch Preferences"
+    height="200" width="400"
+    dlgbuttons="accept,cancel"
+    windowtype=""
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"  >
+
+  <prefpane id="sitesearch-main-pane" label="SiteSearch Settings">
+   
+    <preferences>
+
+      <!--// set instantApply explicitly for bug293439 ? //-->
+      <preference id="extensions.sitesearch@dewdrops.net.toolbar-opennewtab"
+                  instantApply="true"
+                  name="extensions.sitesearch@dewdrops.net.toolbar-opennewtab"
+                  type="bool" />
+      <preference id="extensions.sitesearch@dewdrops.net.rightclick-opennewtab"
+                  instantApply="true"
+                  name="extensions.sitesearch@dewdrops.net.rightclick-opennewtab"
+                  type="bool" />
+    </preferences>
+    
+    <!--//  Right-click options //-->
+    <label value="Right-Click Options" />
+    <groupbox align="start">         
+      <checkbox id="rightclick-opennewtab" 
+		label="Open search in new tab"
+		preference="extensions.sitesearch@dewdrops.net.rightclick-opennewtab" />
+    </groupbox>    
+
+    <!--// Toolbar Options //-->
+    <label value="Toolbar Options" />
+    <groupbox align="start">         
+      <checkbox id="toolbar-opennewtab" 
+		label="Open search in new tab"
+		preference="extensions.sitesearch@dewdrops.net.toolbar-opennewtab" />
+    </groupbox>    
+  </prefpane>
+    <!--// Put script after prefpanes for bug 296418   //-->
+    <script type="application/x-javascript"
+            src="chrome://sitesearch/content/options.js" />
+</prefwindow>

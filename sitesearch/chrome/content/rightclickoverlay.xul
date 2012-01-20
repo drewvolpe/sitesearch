@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+
+<overlay id="sitesearchrightclickoverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://sitesearch/content/sitesearchtoolbar.js"></script>
+  <popup id="contentAreaContextMenu">
+    <menuitem id="rightclicksitesearch" label="Search This Site (all sub-domains)"
+         insertbefore="context-viewpartialsource-selection,context-bookmarkpage,context-copy"
+         oncommand="net.dewdrops.SiteSearch.sitesearchselection(false);" />
+    <menuitem id="rightclickhostsearch" label="Search This Host (only this server)"
+         insertbefore="context-viewpartialsource-selection,context-bookmarkpage,context-copy"
+         oncommand="net.dewdrops.SiteSearch.sitesearchselection(true);" />
+  </popup>
+</overlay>

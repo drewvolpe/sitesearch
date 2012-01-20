@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<overlay id="sample" 
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript"
+            src="chrome://sitesearch/content/sitesearchtoolbar.js" />
+
+    <toolbox id="navigator-toolbox">
+        <toolbar id="sitesearch-toolbar" toolbarname="Site Search" accesskey="s"
+                 class="chromeclass-toolbar" context="toolbar-context-menu" 
+                 hidden="false" persist="hidden" align="center">
+            <toolbaritem flex="10">  
+            </toolbaritem>   
+            <label value="Site Search:"/>                
+            <toolbaritem id="sitesearchtoolbar" persist="width">
+                <textbox id="sitesearchbox" value=""
+                 enablehistory="true"
+                 autocompletepopup="PopupAutoComplete"
+	         autocompletesearch="form-history"
+                 autocompletesearchparam="searchbar-history"
+                 type="autocomplete"
+                 ontextentered="net.dewdrops.SiteSearch.search()" />
+            </toolbaritem>
+	    <menulist id="searchtype" >
+	      <menupopup>
+		<menuitem label="Current Site" value="sitesearch"/>
+		<menuitem label="Current Host" value="hostsearch"/>
+		<menuitem label="Your Top Visited Sites" value="topsitesearch"/>
+		<menuitem label="Drew's Top Visited Sites" value="drewwebsearch"/>
+		<menuitem label="Google" value="websearch"/>
+	      </menupopup>
+	    </menulist>
+
+            <button label="Search" oncommand="net.dewdrops.SiteSearch.search()"/>
+
+            <label id="statuslabel" value="" />
+           <toolbarspring />
+      
+         </toolbar>
+     </toolbox>
+</overlay>
