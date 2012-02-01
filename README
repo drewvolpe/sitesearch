@@ -1,0 +1,10 @@
+
+
+Firefox addon for searching the site you're currently browsing.
+
+To build it:
+   run 'makeXPI.sh'
+
+This will bundle it up as a Firefox addon, sitesearch.xpi.
+
+

@@ -34,7 +34,9 @@
             <button label="Search" oncommand="net.dewdrops.SiteSearch.search()"/>
 
             <label id="statuslabel" value="" />
-           <toolbarspring />
+            <toolbarspring />
+            <button label="Hide" oncommand="net.dewdrops.SiteSearch.hide_toolbar()"/>
+
       
          </toolbar>
      </toolbox>

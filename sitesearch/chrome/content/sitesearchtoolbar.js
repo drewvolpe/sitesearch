@@ -46,6 +46,12 @@ net.dewdrops.SiteSearch = function() {
   // toolbar functions
   //
 
+  pub.hide_toolbar = function() {
+      toolbar = document.getElementById('sitesearch-toolbar');
+      toolbar.collapsed = true;
+  }
+
+
   // IDs of the default CSEs
   pub.CSEDrewSearch = '004961861728436980931%3Ahvx9p6midty';
   pub.CSEDefault = '011728537687655009530%3Ao7u-bn_5me4';
