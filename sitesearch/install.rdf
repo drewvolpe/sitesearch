@@ -6,7 +6,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="sitesearch@dewdrops.net"
                    em:name="Site Search"
-                   em:version="1.1"
+                   em:version="1.2"
                    em:creator="Drew Volpe"
                    em:description="Search the currently-viewed site or the top most visited domains in your history from either a toolbar or by selecting text and using the right-click menu."
                    em:homepageURL="http://www.dewdrops.net/sitesearch/"
@@ -15,7 +15,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>3.0</em:minVersion>
-        <em:maxVersion>4.0.*</em:maxVersion>
+        <em:maxVersion>9.0.*</em:maxVersion>
       </Description>
     </em:targetApplication>
   </RDF:Description>

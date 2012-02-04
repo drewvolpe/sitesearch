@@ -5,7 +5,8 @@ if(!net.dewdrops) net.dewdrops={};
 net.dewdrops.SiteSearch = function() {
   var pub = {};
   pub.SITES = '';
-  pub.MAX_DOMAINS = 25;  // cutoff for most domains to use
+  pub.MAX_DOMAINS = 25;  // cutoff for most domains to use in a search
+  pub.MAX_HISTORY = 10000; // go back this many history elems (for speed)
   pub.NUM_DOMAINS = 0;
   pub.LAST_SITE = '';
   pub.Domain = function(theURL, theCount) {
@@ -45,7 +46,6 @@ net.dewdrops.SiteSearch = function() {
   //
   // toolbar functions
   //
-
   pub.hide_toolbar = function() {
       toolbar = document.getElementById('sitesearch-toolbar');
       toolbar.collapsed = true;
@@ -145,9 +145,9 @@ net.dewdrops.SiteSearch = function() {
     if (pub.SITES == '') pub.createengine(); // init sites list
     if (pub.SITES == '') return;
 
-    // GOOG doesn't allow multiple sites passed in, so we use gigablast
-    var url = 'http://gigablast.com/index.php?plus=&quote1=&quote2=&minus=&url=&sc=1&ns=3&n=10&lang=&freshness=&date1=&date2=&ff=1&q=' + pub.trimString(searchterms) + '+(' + pub.SITES + ')';
-
+    // GOOG doesn't allow multiple sites passed in, so we use Bing
+    var url = 'http://www.bing.com/search?q=' + pub.trimString(searchterms) +
+                                                '+%28' + pub.SITES + '%29';
     if (pub.getBoolPref("extensions.sitesearch@dewdrops.net.toolbar-opennewtab")) {
 	var newTab = getBrowser().addTab(url);
 	getBrowser.selectedTab = newTab;
@@ -156,35 +156,9 @@ net.dewdrops.SiteSearch = function() {
     }
     pub.status('Using your ' + pub.NUM_DOMAINS + ' most visited sites.');
 
-/***
- *TODO - figure out why POST requests not working
-    var url = 'http://www.giagblast.com/index.php';
-    // for syntax, see: http://gigablast.com/index.php?page=help#query-syntax
-    var dataString = '\r\nq=drew\r\n';  //' + searchterms; 
-    const Cc = Components.classes;
-    const Ci = Components.interfaces;
-    var stringStream = Cc["@mozilla.org/io/string-input-stream;1"].
-                       createInstance(Ci.nsIStringInputStream);
-    if ("data" in stringStream) // Gecko 1.9 or newer
-        stringStream.data = dataString;
-    else // 1.8 or older
-        stringStream.setData(dataString, dataString.length);
-
-    var postData = Cc["@mozilla.org/network/mime-input-stream;1"].
-                       createInstance(Ci.nsIMIMEInputStream);
-    postData.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    postData.addContentLength = true;
-    postData.setData(stringStream);
-dump('loading with postData: ' + stringStream.data);
-    var browser = getBrowser();
-    browser.loadURIWithFlags(url, browser.LOAD_FLAGS_NONE, null, postData, null);
-dump('done.');
-**
-*/
-      // update list of SITES
-      pub.createengine();
+    // update list of SITES
+    pub.createengine();
   }
-
 
   pub.createengine = function() {
 
@@ -202,7 +176,7 @@ dump('done.');
 
       var result = historyService.executeQuery(query, options);
       var domainCountsMap = [];  // domain -> count
-      pub.getDomains(result.root, domainCountsMap);
+      pub.getDomains(result.root, domainCountsMap, 0);
 
       var domains = [];
       for (var url in domainCountsMap) {
@@ -220,24 +194,24 @@ dump('done.');
       }
 
       pub.NUM_DOMAINS = (domains.length < pub.MAX_DOMAINS ? domains.length : pub.MAX_DOMAINS);
-      pub.SITES = 'site:' + domains[0].url;
+      pub.SITES = '';
       for (var i=0; i < domains.length && i < pub.MAX_DOMAINS; i++) {
-  	  //        net.dewdrops.SiteSearch.SITES +=  domains[i].url + '%0D%0A';    
-	  pub.SITES +=  '++UOR+' + domains[i].url;    
+	  pub.SITES += 'site%3A' + domains[i].url + "+OR+"
       }
   }
 
-  pub.getDomains = function(node, resultMap) {
-
+  pub.getDomains = function(node, resultMap, nodesCount) {
       node.containerOpen = true;
       for (var i=0; i < node.childCount; i++) {
+	  if (nodesCount > pub.MAX_HISTORY) {
+	      return;
+	  }
           var childNode = node.getChild(i);
           var type = childNode.type;
           if (type == Components.interfaces.nsINavHistoryResultNode.
                       RESULT_TYPE_URI ||
               type == Components.interfaces.nsINavHistoryResultNode.
                       RESULT_TYPE_VISIT) {
-
               var domain = pub.getDomain(childNode.uri);
               if (domain == "undefined.") {
                   continue; // skip undefined domains
@@ -253,11 +227,12 @@ dump('done.');
               childNode.QueryInterface(Components.interfaces.
                                        nsINavHistoryContainerResultNode);
               childNode.containerOpen = true;
-              pub.getDomains(childNode, resultMap);
+              nodesCount += pub.getDomains(childNode, resultMap, nodesCount);
               childNode.containerOpen = false;
           }
       }
       node.containerOpen = false;
+      return nodesCount;
   }
 
 
