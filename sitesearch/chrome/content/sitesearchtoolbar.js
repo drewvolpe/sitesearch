@@ -6,7 +6,7 @@ net.dewdrops.SiteSearch = function() {
   var pub = {};
   pub.SITES = '';
   pub.MAX_DOMAINS = 25;  // cutoff for most domains to use in a search
-  pub.MAX_HISTORY = 10000; // go back this many history elems (for speed)
+  pub.MAX_HISTORY = 20000; // go back this many history elems (for speed)
   pub.NUM_DOMAINS = 0;
   pub.LAST_SITE = '';
   pub.Domain = function(theURL, theCount) {
@@ -161,21 +161,24 @@ net.dewdrops.SiteSearch = function() {
   }
 
   pub.createengine = function() {
-
+      pub.status("Building sites...");
       var historyService =
           Components.classes["@mozilla.org/browser/nav-history-service;1"]
           .getService(Components.interfaces.nsINavHistoryService);
 
-      var query = historyService.getNewQuery();
+      var query2 = historyService.getNewQuery();
+      query2.beginTimeReference = query2.TIME_RELATIVE_NOW;
+      query2.beginTime = -1 * 30 *24*60*60*1000000; // 30 days ago in microseconds
+      query2.endTimeReference = query2.TIME_RELATIVE_NOW;
+      query2.endTime = 0; // now
 
-      // no params returns everything
       var options = historyService.getNewQueryOptions();
       options.sortingMode = options.SORT_BY_VISITCOUNT_DESCENDING;
       options.resultType = options.RESULTS_AS_VISIT;
       // options.queryType = options.QUERY_TYPE_UNIFIED;
 
-      var result = historyService.executeQuery(query, options);
-      var domainCountsMap = [];  // domain -> count
+      var result = historyService.executeQuery(query2, options);
+      var domainCountsMap = [];  // domain -> # of visits
       pub.getDomains(result.root, domainCountsMap, 0);
 
       var domains = [];
@@ -198,13 +201,16 @@ net.dewdrops.SiteSearch = function() {
       for (var i=0; i < domains.length && i < pub.MAX_DOMAINS; i++) {
 	  pub.SITES += 'site%3A' + domains[i].url + "+OR+"
       }
+      pub.status("");
   }
 
-  pub.getDomains = function(node, resultMap, nodesCount) {
+  pub.getDomains = function(node, resultMap, nodesSeen) {
+      var oldOpen = node.containerOpen;
       node.containerOpen = true;
       for (var i=0; i < node.childCount; i++) {
-	  if (nodesCount > pub.MAX_HISTORY) {
-	      return;
+	  nodesSeen++;
+	  if (nodesSeen > pub.MAX_HISTORY) {
+	      return nodesSeen;
 	  }
           var childNode = node.getChild(i);
           var type = childNode.type;
@@ -227,12 +233,12 @@ net.dewdrops.SiteSearch = function() {
               childNode.QueryInterface(Components.interfaces.
                                        nsINavHistoryContainerResultNode);
               childNode.containerOpen = true;
-              nodesCount += pub.getDomains(childNode, resultMap, nodesCount);
+              nodesSeen += pub.getDomains(childNode, resultMap, nodesSeen);
               childNode.containerOpen = false;
           }
       }
-      node.containerOpen = false;
-      return nodesCount;
+      node.containerOpen = oldOpen;
+      return nodesSeen;
   }
 
 
