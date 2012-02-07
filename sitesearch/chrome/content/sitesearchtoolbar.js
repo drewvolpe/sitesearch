@@ -77,6 +77,7 @@ net.dewdrops.SiteSearch = function() {
 
   pub.sitesearch = function(searchterms, isHostSearch, isRightClick) {
       pub.status("");
+      searchterms = encodeURIComponent(searchterms)
       var currentURI = getBrowser().currentURI;
       if (currentURI == null) {
           pub.status('No current site. Navigate somewhere first.');
@@ -128,6 +129,7 @@ net.dewdrops.SiteSearch = function() {
 
   pub.websearch = function(searchterms, CSE) {
       pub.status("");
+      searchterms = encodeURIComponent(searchterms)
       var url = 'http://www.google.com/cse?cx=' + CSE + 
                 '&ie=UTF-8&sa=Search&q=' + searchterms;
 
@@ -140,24 +142,24 @@ net.dewdrops.SiteSearch = function() {
   }
 
   pub.topsitesearch = function(searchterms) {
-    pub.status("");
+      pub.status("");
+      searchterms = encodeURIComponent(searchterms);
+      if (pub.SITES == '') pub.createengine(); // init sites list
+      if (pub.SITES == '') return;
 
-    if (pub.SITES == '') pub.createengine(); // init sites list
-    if (pub.SITES == '') return;
+      // GOOG doesn't allow multiple sites passed in, so we use Bing
+      var url = 'http://www.bing.com/search?q=' + pub.trimString(searchterms) +
+                '+%28' + pub.SITES + '%29';
+      if (pub.getBoolPref("extensions.sitesearch@dewdrops.net.toolbar-opennewtab")) {
+	  var newTab = getBrowser().addTab(url);
+	  getBrowser.selectedTab = newTab;
+      } else {
+	  getBrowser().loadURI(url, null, null);
+      }
+      pub.status('Using your ' + pub.NUM_DOMAINS + ' most visited sites.');
 
-    // GOOG doesn't allow multiple sites passed in, so we use Bing
-    var url = 'http://www.bing.com/search?q=' + pub.trimString(searchterms) +
-                                                '+%28' + pub.SITES + '%29';
-    if (pub.getBoolPref("extensions.sitesearch@dewdrops.net.toolbar-opennewtab")) {
-	var newTab = getBrowser().addTab(url);
-	getBrowser.selectedTab = newTab;
-    } else {
-	getBrowser().loadURI(url, null, null);
-    }
-    pub.status('Using your ' + pub.NUM_DOMAINS + ' most visited sites.');
-
-    // update list of SITES
-    pub.createengine();
+      // update list of SITES
+      pub.createengine();
   }
 
   pub.createengine = function() {
